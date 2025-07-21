@@ -1,11 +1,11 @@
 import requests
 import re
 import urllib
-
+import os
 
 URL_LOGIN = "https://client.webhostmost.com/login"
-DA_LOGIN = 'user@example.com'
-DA_PASS = 'pwd'
+DA_LOGIN = os.environ.get("MY_USERNAME")
+DA_PASS = os.environ.get("MY_PASSWORD")
 HEADERS = {'Content-Type': 'application/x-www-form-urlencoded'}
 
 HTML_FILE1 = "login1.html"
