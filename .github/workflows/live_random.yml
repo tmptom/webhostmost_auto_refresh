@@ -65,8 +65,16 @@ jobs:
       - name: Run live.py
         if: steps.decide.outputs.should_run == 'true'
         env:
-          MY_USERNAME: ${{ secrets.MY_USERNAME }}
-          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+          MY_USERNAME_1: ${{ secrets.MY_USERNAME_1 }}
+          MY_PASSWORD_1: ${{ secrets.MY_PASSWORD_1 }}
+          MY_USERNAME_2: ${{ secrets.MY_USERNAME_2 }}
+          MY_PASSWORD_2: ${{ secrets.MY_PASSWORD_2 }}
+          MY_USERNAME_3: ${{ secrets.MY_USERNAME_3 }}
+          MY_PASSWORD_3: ${{ secrets.MY_PASSWORD_3 }}
+          MY_USERNAME_4: ${{ secrets.MY_USERNAME_4 }}
+          MY_PASSWORD_4: ${{ secrets.MY_PASSWORD_4 }}
+          MY_USERNAME_5: ${{ secrets.MY_USERNAME_5 }}
+          MY_PASSWORD_5: ${{ secrets.MY_PASSWORD_5 }}
         run: |
           python webhostmost_auto_refresh/live.py
 
