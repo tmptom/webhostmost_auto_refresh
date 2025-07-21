@@ -1,0 +1,72 @@
+# .github/workflows/live_random.yml
+name: Run live.py randomly every 5-9 days
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 每天凌晨6点（UTC），可根据需要调整
+  workflow_dispatch:      # 允许手动触发
+
+jobs:
+  run-live:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+        # 如果没有 requirements.txt，可以省略或直接安装需要的包
+
+      - name: Decide whether to run
+        id: decide
+        run: |
+          STATE_FILE=".github/live_last_run.txt"
+          NOW=$(date +%s)
+          if [ -f "$STATE_FILE" ]; then
+            LAST_RUN=$(cat $STATE_FILE | head -n1)
+            NEXT_INTERVAL=$(cat $STATE_FILE | tail -n1)
+          else
+            LAST_RUN=0
+            NEXT_INTERVAL=0
+          fi
+
+          # 如果没有下次间隔，生成一个新的
+          if [ "$NEXT_INTERVAL" -eq 0 ]; then
+            NEXT_INTERVAL=$(( (RANDOM % 5) + 5 ))  # 5-9天
+          fi
+
+          # 计算距离上次运行的天数
+          DIFF_DAYS=$(( (NOW - LAST_RUN) / 86400 ))
+
+          echo "Last run: $LAST_RUN, Next interval: $NEXT_INTERVAL, Diff days: $DIFF_DAYS"
+
+          if [ "$DIFF_DAYS" -ge "$NEXT_INTERVAL" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+            # 生成下一个随机间隔
+            NEW_INTERVAL=$(( (RANDOM % 5) + 5 ))
+            echo "$NOW" > $STATE_FILE
+            echo "$NEW_INTERVAL" >> $STATE_FILE
+            git config --global user.email "action@github.com"
+            git config --global user.name "GitHub Action"
+            git add $STATE_FILE
+            git commit -m "Update last run time for live.py"
+            git push
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run live.py
+        if: steps.decide.outputs.should_run == 'true'
+        env:
+          MY_USERNAME: ${{ secrets.MY_USERNAME }}
+          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+        run: |
+          python webhostmost_auto_refresh/live.py
+
