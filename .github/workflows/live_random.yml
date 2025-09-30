@@ -4,7 +4,7 @@ name: Run live.py every 6 days
 
 on:
   schedule:
-    - cron: '0 6 */6 * *'   # 每 6 天的 UTC 6:00 运行一次
+    - cron: '0 6 1,16 * *'   # 每 6 天的 UTC 6:00 运行一次
   workflow_dispatch:        # 允许手动触发
 
 jobs:
@@ -26,9 +26,9 @@ jobs:
 
       - name: Run live.py
         env:
-          MY_USERNAME_1: ${{ secrets.MY_USERNAME_1 }}
-          MY_PASSWORD_1: ${{ secrets.MY_PASSWORD_1 }}
-          MY_USERNAME_2: ${{ secrets.MY_USERNAME_2 }}
-          MY_PASSWORD_2: ${{ secrets.MY_PASSWORD_2 }}
+          MY_USERNAME_1: ${{ secrets.n1 }}
+          MY_PASSWORD_1: ${{ secrets.p1 }}
+          MY_USERNAME_2: ${{ secrets.n2 }}
+          MY_PASSWORD_2: ${{ secrets.p2 }}
         run: |
           python live.py
